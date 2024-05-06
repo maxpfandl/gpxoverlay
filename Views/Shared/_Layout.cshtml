@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-464150-11"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-464150-11');
+    </script>
+    <script data-ad-client="ca-pub-6323625457274898" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - gpxoverlay</title>
+    <meta name="description" content="Share your running and trailrunning photos with gpx-stats! Merge pictures with gpx data from a file or from garmin directly and create an overlay with pace, distance, elevationgain, time and an outline of the track." />
+    <meta name="keywords" content = "gpx,stats,overlay,share stats,strava,runtastic,garmin,images,photos"/>
+    <meta name="author" content="Max Pfandl">
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"/>
+    </environment>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">gpxoverlay v0.7-beta</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Features">Features</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Info">Info</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+            <p style="font-size: xx-small;"><br></p>
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - gpxoverlay by Max Pfandl</a>
+        </div>
+    </footer>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+        </script>
+    </environment>
+    <script type="text/javascript">
+
+$(function () {
+
+    $( document ).ready(function() {
+        var track = localStorage.getItem('useTrack');
+        if(track === "garmin"){
+            setGarmin();
+        }
+        var override = localStorage.getItem('override');
+        if(override === "true"){
+            $("#overrideParameters").toggle();
+        }
+    });
+
+    $('#toggleOverride').click(function () {
+
+        $("#overrideParameters").toggle();
+        var override = localStorage.getItem('override');
+        if(override !== "true"){
+            localStorage.setItem('override',true);
+        } else {
+            localStorage.setItem('override',false);
+        }
+
+    });
+
+    $('#useTrack').on('change', function() {
+            if(this.value === "garmin"){
+                setGarmin();
+            } else {
+                setGpxFile();
+            }
+    });
+
+    function setGarmin(){
+        $('#useTrack').val('garmin');
+        $("#garminFileLoader").show();
+        $("#gpxFileLoader").hide();
+        $("#gpxFile").prop('required',false);
+        $("#guser").prop('required',true);
+        $("#gpw").prop('required',true);
+        localStorage.setItem('useTrack','garmin');
+    }
+
+    function setGpxFile(){
+
+        $('#useTrack').val('gpx');
+        $("#garminFileLoader").hide();
+        $("#gpxFileLoader").show();
+        $("#gpxFile").prop('required',true);
+        $("#guser").prop('required',false);
+        $("#gpw").prop('required',false);
+        localStorage.setItem('useTrack','gpx');
+
+    }
+    
+
+});
+
+</script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

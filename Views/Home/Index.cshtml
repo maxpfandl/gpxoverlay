@@ -1,0 +1,165 @@
+﻿@{
+    ViewData["Title"] = "Add gpx data to your pictures!";
+}
+
+<style>
+    label {
+        width: 110px;
+    }
+</style>
+
+<div>
+
+    <p>To create an overlay with gpx-data, please upload the photo you want it applied to and upload the gpx-file or
+        enter user/password for garmin.</p>
+    <p>For a sample, please click @Html.ActionLink("here", "Sample", "Home").</p>
+    <em>No uploaded data is stored on the server at any time! Garmin-Exports are cached for 10 minutes.</em>
+    <p style="font-size: xx-small;"><br></p>
+    <form style="background-color:lightgray;padding:20px" method="post" enctype="multipart/form-data"
+        asp-controller="Home" asp-action="CreateOverlay">
+        <em>Data:</em>
+        <div class="form-group">
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" name="title">
+            </div>
+            <div>
+                <label for="file">Picture:</label>
+                <input type="file" name="foto" single>
+                <p style="font-size:x-small">Picture will be scaled to 2048px on the shorter side.<br>If no picture is
+                    selected, a black canvas is used.</p>
+            </div>
+            <div>
+                <label for="useTrack">Track from:</label>
+                <select id="useTrack" name="useTrack" size="1" single>
+                    <option value="gpx">gpx file</option>
+                    <option value="garmin">Garmin</option>
+                </select>
+            </div>
+            <div id="gpxFileLoader">
+                <label for="file">GpxFile:</label>
+                <input id="gpxFile" type="file" name="gpx" single required>
+            </div>
+            <div id="garminFileLoader" style="display:none">
+                <p style="font-size:x-small">Track from Garmin will be cached for 10 minutes: make sure the track you
+                    want to use is the latest!</p>
+                <div>
+                    <label for="guser">Username:</label>
+                    <input type="text" id="guser" name="guser" autocomplete="username">
+                </div>
+                <div>
+                    <label for="gpw">Password:</label>
+                    <input type="password" id="gpw" name="gpw" autocomplete="current-password">
+                </div>
+            </div>
+        </div>
+        <div>
+            <p><a id="toggleOverride" href="#">Toggle Advanced Parameters</a></p>
+        </div>
+        <div id="overrideParameters" class="form-group" style="display:none">
+            <div>
+                <label for="dist">Distance:</label>
+                <input type="double" name="dist">
+                <p style="font-size:x-small">Override Distance from Track</p>
+            </div>
+            <div>
+                <label for="elev">Elevation Gain:</label>
+                <input type="double" name="elev">
+                <p style="font-size:x-small">Override Elevation Gain from Track. Only shown if >100m or >300ft</p>
+            </div>
+            <div>
+                <label for="time">Time:</label>
+                <input type="TimeSpan" name="time">
+                <p style="font-size:x-small">Override Time from Track</p>
+            </div>
+            <div>
+                <label for="units">Units:</label>
+                <select name="units" size="1" single>
+                    <option value="metric">metric</option>
+                    <option value="imperial">imperial</option>
+                </select>
+            </div>
+            <div>
+                <label for="speedmeasure">Speedmeasure:</label>
+                <select name="speedmeasure" size="1" single>
+                    <option value="pace">pace</option>
+                    <option value="speed">speed</option>
+                </select>
+                <p style="font-size:x-small">Display pace (min/km or min/mile) or speed (km/h or mph)</p>
+            </div>
+            <div>
+                <label for="movingType">Timemeasure:</label>
+                <select name="movingType" size="1" single>
+                    <option value="moving">moving</option>
+                    <option value="complete">total</option>
+                </select>
+                <p style="font-size:x-small">Time in motion (>1m/30sec) or total time? Effective only if time is not
+                    manually set.</p>
+            </div>
+            <div>
+                <label for="rotate">Rotate Image:</label>
+                <select name="rotate" size="1" single>
+                    <option value="0">0°</option>
+                    <option value="90">90°</option>
+                    <option value="180">180°</option>
+                    <option value="270">270°</option>
+                </select>
+            </div>
+            <div>
+                <label for="reduce">Reduce Track:</label>
+                @Html.CheckBox("reduce", true)
+                <p style="font-size:x-small">Applies Douglas Peucker Reduction to the Track</p>
+            </div>
+            <div>
+                <label for="elevationGraph">Elevationgraph:</label>
+                @Html.CheckBox("elevationGraph", true)
+                <p style="font-size:x-small">Only shown if elevationgain >100m or >300ft</p>
+            </div>
+            <div>
+                <label for="trackThickness">Track Thickness:</label>
+                <input type="number" name="trackThickness" value="10" min="1" max="100" step="1" pattern="[0-9]{10}">px
+                <p style="font-size:x-small">Adjust the thickness of the line used to draw the track. Always relative to
+                    the size of the image.</p>
+            </div>
+
+            <div>
+                <label for="logo">Logo:</label>
+                <input type="file" name="logo" single>
+                <p style="font-size:x-small">Logo will be scaled to 500px width and displayed top left. Should be
+                    transparent</p>
+            </div>
+
+            <div>
+                <label for="layout">Layout:</label>
+                <select name="layout" size="1" single>
+                    <option value="default">default</option>
+                    <option value="trackOnly">only track/elevationgraph</option>
+                </select>
+                <p style="font-size:x-small">Use default layout with details or only overlay the track to the picture
+                </p>
+            </div>
+            <div>
+                <label for="layout">Gradient:</label>
+                @Html.CheckBox("btmGradient", true)
+                <p style="font-size:x-small">Draw a Gradient at the bottom and top of the picture to set a contrast of
+                    the title/stats
+                </p>
+            </div>
+            <div>
+                <label for="color">Color:</label>
+                <input type="color" name="color" value="#f5f5f5"><br />
+                <label for="shadowcolor">Shadow:</label>
+                <input type="color" name="shadowcolor" value="#000000">
+                <p style="font-size:x-small">Override color of the overlay</p>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <div>
+                <input type="submit" name="command" value="Download Overlay">
+                <input type="submit" name="command" value="Create Preview">
+            </div>
+        </div>
+    </form>
+</div>

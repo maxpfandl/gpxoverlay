@@ -1,0 +1,24 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+<h3>Please check the provided Files</h3>
+<p>
+    Please verify that the provide image is a valid image-file and the provided gpx or usercredentials are correct.
+
+</p>
+<p>
+    <em><strong>Currently there are Issues with the authentication to Garmin: please try to provide the gpx file directly!</strong><br>
+    They are making it hard to download activities without paying them 5,000.00 USD for API access: I won't buy this.</em>
+</p>
